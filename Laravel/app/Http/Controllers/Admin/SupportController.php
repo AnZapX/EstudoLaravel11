@@ -11,8 +11,17 @@ class SupportController{
 
         $supports = $support->all();
         
-
         return view('admin/supports/index', compact('supports'));
+    }
+
+    public function show(string|int $id){
+        //Support::find($id);
+        //Support::where('id', $id)-first();
+        if(!$support = Support::find($id)){
+            return back();
+        }
+
+        return view('admin/supports/show', compact('support'));
     }
 
     public function create(){
@@ -26,6 +35,5 @@ class SupportController{
         $support->create($data);
 
         return redirect()->route('supports.index');
-        
     }
 }
