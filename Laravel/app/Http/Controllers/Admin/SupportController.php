@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\StoreUpdateSupportRequest;
 use App\Models\Support;
 use Illuminate\Http\Request;
 
@@ -28,11 +29,43 @@ class SupportController{
         return view('admin/supports/create');
     }
 
-    public function store(Request $request, Support $support){
-        $data = $request->all();
+    public function store(StoreUpdateSupportRequest $request, Support $support){
+        //pega apenas os dados validados
+        $data = $request->validated();
         $data['status'] = 'a';
 
         $support->create($data);
+
+        return redirect()->route('supports.index');
+    }
+
+    public function edit(Support $support, String | int $id){
+
+        if(!$support = $support->where('id', $id)->first()){
+            return back();
+        }
+        return view('admin/supports.edit', compact('support'));
+    }
+
+    public function update(StoreUpdateSupportRequest $request, Support $support, String $id){
+        //Recupera o item pelo id
+        if(!$support = $support->find($id)){
+            return back();
+        }
+
+        $support->update($request->only([
+            'subject',
+            'body'
+        ]));
+        
+        return redirect()->route('supports.index');
+    }
+    public function destroy(String|int $id){
+        if(!$support = Support::find($id)){
+            return back();
+        }
+
+        $support->delete();
 
         return redirect()->route('supports.index');
     }
